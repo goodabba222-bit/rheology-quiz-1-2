@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>물성(Rheology)의 이해 · 2차시 대화형 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F9FA;
+    --surface: #FFFFFF;
+    --ink: #16233F;
+    --ink-soft: #5B6B85;
+    --line: #E1E8EE;
+    --teal: #0EA5A4;
+    --teal-dark: #0A8483;
+    --teal-tint: #E4F6F5;
+    --amber: #F2A93B;
+    --correct: #17A363;
+    --correct-bg: #E8F8EF;
+    --wrong: #E1435A;
+    --wrong-bg: #FDEAEC;
+    --radius: 18px;
+    --font-display: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+    --font-body: 'Noto Sans KR', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Noto Sans KR', monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      radial-gradient(circle at 12% 0%, #E9F7F6 0%, transparent 45%),
+      radial-gradient(circle at 100% 15%, #FBF3E2 0%, transparent 40%),
+      var(--bg);
+    min-height:100vh;
+    font-family: var(--font-body);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 20px 16px 64px; }
+
+  header.top{ text-align:center; padding: 22px 4px 6px; }
+  .eyebrow{
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .16em;
+    color: var(--teal-dark); text-transform: uppercase; font-weight: 600;
+  }
+  h1.title{
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(26px, 6vw, 34px); margin: 8px 0 4px; letter-spacing: -0.01em;
+  }
+  .subtitle{ color: var(--ink-soft); font-size: 14.5px; margin: 0; }
+
+  /* ---------- Start card ---------- */
+  .start-screen{ margin-top: 26px; }
+  .start-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 26px 22px 24px; text-align:center; box-shadow: 0 6px 20px rgba(16,40,60,.05);
+  }
+  .start-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    width: 60px; height:60px; border-radius: 16px; background: var(--teal-tint); color: var(--teal-dark);
+    font-family: var(--font-display); font-weight:700; font-size: 22px; margin-bottom: 14px;
+  }
+  .start-card h2{ font-family: var(--font-display); font-size: 20px; margin: 4px 0 6px; }
+  .start-card p{ color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
+  .start-meta{
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft);
+    margin-bottom: 20px; display:flex; justify-content:center; gap: 14px;
+  }
+  .start-btn{
+    border:none; background: var(--teal); color:#fff; font-family: var(--font-body);
+    font-weight:700; font-size: 15px; padding: 13px 28px; border-radius: 12px; cursor:pointer;
+  }
+  .start-btn:hover{ background: var(--teal-dark); }
+
+  footer.hint{ text-align:center; color: var(--ink-soft); font-size: 12.5px; margin-top: 30px; line-height:1.6; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-screen{ display:none; }
+  .quiz-topbar{ display:flex; align-items:center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .back-btn{
+    border:none; background: transparent; color: var(--ink-soft); font-family: var(--font-body);
+    font-size: 13.5px; cursor:pointer; padding: 6px 4px; display:flex; align-items:center; gap:4px;
+  }
+  .back-btn:hover{ color: var(--ink); }
+
+  .score-gauge{
+    display:flex; align-items:center; gap: 8px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 14px 6px 8px;
+  }
+  .score-gauge svg{ width:30px; height:30px; display:block; }
+  .score-gauge .pts{ font-family: var(--font-mono); font-weight:600; font-size: 14px; color: var(--teal-dark); min-width: 54px; }
+  .score-gauge .pts.bump{ animation: bump .4s ease; }
+  @keyframes bump{ 0%{ transform: scale(1); } 40%{ transform: scale(1.28); color: var(--amber); } 100%{ transform: scale(1); } }
+
+  .session-title-row{ margin-bottom: 10px; }
+  .session-title-row h2{ font-family: var(--font-display); font-size: 19px; margin: 0; }
+
+  .progress-track{ display:flex; gap: 5px; margin-bottom: 6px; }
+  .progress-seg{ flex:1; height: 7px; border-radius: 4px; background: var(--line); overflow:hidden; }
+  .progress-seg .fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--teal), var(--teal-dark)); transition: width .35s ease; }
+  .progress-label{ font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); margin-bottom: 18px; }
+
+  .q-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 20px 20px; box-shadow: 0 6px 20px rgba(16,40,60,.05);
+  }
+  .q-type{
+    display:inline-block; font-family: var(--font-mono); font-size: 11px; font-weight:600; letter-spacing: .04em;
+    padding: 3px 9px; border-radius: 999px; background: var(--teal-tint); color: var(--teal-dark); margin-bottom: 10px;
+  }
+  .q-text{ font-size: 16.5px; font-weight: 700; line-height: 1.5; margin: 0 0 16px; }
+
+  .opt-list{ display:flex; flex-direction:column; gap:9px; }
+  .opt-btn{
+    display:flex; align-items:center; gap: 10px; text-align:left; width:100%; padding: 12px 14px;
+    border-radius: 12px; border: 1.5px solid var(--line); background: #FCFDFE; font-family: var(--font-body);
+    font-size: 14.5px; color: var(--ink); cursor:pointer; transition: border-color .12s ease, background .12s ease, transform .08s ease;
+  }
+  .opt-btn:hover:not(:disabled){ border-color: var(--teal); background: var(--teal-tint); }
+  .opt-btn:active:not(:disabled){ transform: scale(.99); }
+  .opt-mark{
+    flex:0 0 auto; width: 22px; height:22px; border-radius: 50%; border: 1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size: 12px; font-weight:700; color: var(--ink-soft);
+  }
+  .opt-btn:disabled{ cursor:default; }
+  .opt-btn.correct{ border-color: var(--correct); background: var(--correct-bg); }
+  .opt-btn.correct .opt-mark{ border-color: var(--correct); background: var(--correct); color:#fff; }
+  .opt-btn.wrong{ border-color: var(--wrong); background: var(--wrong-bg); }
+  .opt-btn.wrong .opt-mark{ border-color: var(--wrong); background: var(--wrong); color:#fff; }
+  .opt-btn.dim{ opacity: .55; }
+
+  .fill-row{ display:flex; gap: 8px; margin-top: 4px; }
+  .fill-input{
+    flex:1; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line); font-family: var(--font-body);
+    font-size: 15px; outline:none; transition: border-color .12s ease;
+  }
+  .fill-input:focus{ border-color: var(--teal); }
+  .fill-input.correct{ border-color: var(--correct); background: var(--correct-bg); }
+  .fill-input.wrong{ border-color: var(--wrong); background: var(--wrong-bg); }
+  .submit-btn{
+    flex: 0 0 auto; border:none; background: var(--teal); color:#fff; font-family: var(--font-body); font-weight:700;
+    font-size: 14.5px; padding: 0 18px; border-radius: 12px; cursor:pointer; transition: background .12s ease, transform .08s ease;
+  }
+  .submit-btn:hover{ background: var(--teal-dark); }
+  .submit-btn:active{ transform: scale(.97); }
+  .submit-btn:disabled{ background: var(--line); color: var(--ink-soft); cursor:default; }
+
+  .feedback{ margin-top: 16px; padding: 14px 16px; border-radius: 14px; font-size: 14px; line-height: 1.55; display:none; }
+  .feedback.show{ display:block; animation: fadein .25s ease; }
+  @keyframes fadein{ from{ opacity:0; transform: translateY(4px);} to{ opacity:1; transform:none; } }
+  .feedback.correct{ background: var(--correct-bg); color:#0E5C36; border:1px solid #BEE9D0; }
+  .feedback.wrong{ background: var(--wrong-bg); color:#8A2233; border:1px solid #F5C3CB; }
+  .feedback .fb-title{ font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+  .feedback .fb-answer{ font-weight:700; }
+
+  .next-row{ margin-top:18px; display:flex; justify-content:flex-end; }
+  .next-btn{
+    border:none; background: var(--ink); color:#fff; font-family: var(--font-body); font-weight:700; font-size: 14.5px;
+    padding: 11px 20px; border-radius: 12px; cursor:pointer; display:none; align-items:center; gap:6px;
+  }
+  .next-btn.show{ display:inline-flex; animation: fadein .25s ease; }
+  .next-btn:hover{ background:#0B1730; }
+
+  .result-screen{ display:none; }
+  .result-hero{
+    text-align:center; background: var(--surface); border:1px solid var(--line); border-radius: var(--radius);
+    padding: 30px 20px 26px; box-shadow: 0 6px 20px rgba(16,40,60,.05);
+  }
+  .result-hero .ring-wrap{ display:flex; justify-content:center; margin-bottom:8px; }
+  .result-hero svg{ width: 140px; height:140px; }
+  .result-score{ font-family: var(--font-display); font-weight:700; font-size: 30px; }
+  .result-sub{ color: var(--ink-soft); font-size:14px; margin-top:2px; }
+  .result-msg{ margin-top: 14px; font-size: 14.5px; font-weight: 600; }
+
+  .result-list{ margin-top: 18px; display:flex; flex-direction:column; gap: 8px; max-height: 360px; overflow-y:auto; }
+  .result-row{
+    display:flex; align-items:flex-start; gap: 10px; padding: 11px 13px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--surface); font-size: 13.5px; line-height:1.5; text-align:left;
+  }
+  .result-row .icon{
+    flex:0 0 auto; width: 20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size: 12px; font-weight:800; color:#fff; margin-top:1px;
+  }
+  .result-row.ok .icon{ background: var(--correct); }
+  .result-row.no .icon{ background: var(--wrong); }
+
+  .result-actions{ display:flex; flex-direction:column; gap: 10px; margin-top: 22px; }
+  .btn-primary, .btn-secondary{
+    border:none; border-radius: 12px; padding: 13px 16px; font-family: var(--font-body); font-weight:700;
+    font-size: 14.5px; cursor:pointer; width:100%;
+  }
+  .btn-primary{ background: var(--teal); color:#fff; }
+  .btn-primary:hover{ background: var(--teal-dark); }
+  .btn-secondary{ background: var(--surface); color: var(--ink); border:1.5px solid var(--line); }
+  .btn-secondary:hover{ border-color: var(--ink-soft); }
+
+  @media (max-width: 380px){ .q-text{ font-size: 15.5px; } .opt-btn{ font-size: 13.5px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">RHEOLOGY LAB · 형성평가</div>
+    <h1 class="title">물성(Rheology)의 이해</h1>
+    <p class="subtitle">2차시 대화형 학습 퀴즈 · 10문항</p>
+  </header>
+
+  <section class="start-screen" id="startScreen">
+    <div class="start-card">
+      <div class="start-badge">2</div>
+      <h2>고체 물성 측정의 이해</h2>
+      <p>ASTM 표준 용어 · TPA 파라미터 · 측정 주의사항</p>
+      <div class="start-meta"><span>문항 10개</span><span>·</span><span>200점 만점</span></div>
+      <button class="start-btn" id="startBtn">시작하기</button>
+    </div>
+    <footer class="hint">문항을 클릭하거나 답을 입력하면 즉시 정답 여부와 해설을 확인할 수 있어요.<br>이 페이지는 인터넷 연결 없이도 그대로 동작합니다.</footer>
+  </section>
+
+  <section class="quiz-screen" id="quizScreen">
+    <div class="quiz-topbar">
+      <button class="back-btn" id="backBtn">← 처음으로</button>
+      <div class="score-gauge">
+        <svg viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#E1E8EE" stroke-width="4"></circle>
+          <circle id="gaugeRing" cx="18" cy="18" r="15.5" fill="none" stroke="#0EA5A4" stroke-width="4"
+            stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4" transform="rotate(-90 18 18)"></circle>
+        </svg>
+        <span class="pts" id="ptsLabel">0점</span>
+      </div>
+    </div>
+
+    <div class="session-title-row"><h2 id="quizTitle">2차시 · 고체 물성 측정의 이해</h2></div>
+
+    <div class="progress-track" id="progressTrack"></div>
+    <div class="progress-label" id="progressLabel">문항 1 / 10</div>
+
+    <div class="q-card">
+      <span class="q-type" id="qType">객관식</span>
+      <p class="q-text" id="qText"></p>
+      <div id="qBody"></div>
+      <div class="feedback" id="feedback">
+        <div class="fb-title" id="fbTitle"></div>
+        <div id="fbBody"></div>
+      </div>
+      <div class="next-row"><button class="next-btn" id="nextBtn">다음 문항 →</button></div>
+    </div>
+  </section>
+
+  <section class="result-screen" id="resultScreen">
+    <div class="result-hero">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="#E1E8EE" stroke-width="12"></circle>
+          <circle id="resultRing" cx="70" cy="70" r="60" fill="none" stroke="#0EA5A4" stroke-width="12"
+            stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" transform="rotate(-90 70 70)"></circle>
+          <text x="70" y="66" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="26" fill="#16233F" id="resultBig">0</text>
+          <text x="70" y="86" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#5B6B85">POINTS</text>
+        </svg>
+      </div>
+      <div class="result-sub" id="resultCount">0 / 10 정답</div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-list" id="resultList"></div>
+      <div class="result-actions" id="resultActions"></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const QUESTIONS = [{"type":"mc","q":"Strain(변형율)에 대한 설명으로 옳은 것은?","options":["원래 크기 대비 변형된 크기의 비율로 단위가 없다","단위 면적당 작용하는 힘의 강도이다","물체가 견딜 수 있는 최대 압축변형력이다","힘 제거 시 완전히 복원되는 최대 stress이다"],"correct":0,"explain":"Strain은 ΔL/L 비율로, 단위가 없어요.","wrongHint":"②는 Stress, ③은 Compressive strength, ④는 Elastic limit이에요."},{"type":"fill","q":"탄성율(Modulus of Elasticity, E)은 비례한계 내에서 Stress와 (　　)의 비로 정의된다.","accept":["strain","변형율","변형률"],"display":"Strain (변형율)","explain":"E = σ / ε 로 계산해요."},{"type":"mc","q":"다음 중 “Shear stress(전단응력)”에 대한 설명으로 옳은 것은?","options":["힘이 작용하는 평면에 수직으로 작용하는 stress","힘이 작용하는 면과 접선(나란한) 방향으로 작용하는 stress","물체가 견딜 수 있는 최대 인장강도","압축시험에서 최대 load를 단면적으로 나눈 값"],"correct":1,"explain":"Shear stress는 면과 접선(평행) 방향으로 작용해요.","wrongHint":"①은 Normal stress의 정의라 헷갈리기 쉬워요."},{"type":"mc","q":"Bioyield point와 Rupture point의 차이에 대한 설명으로 옳은 것은?","options":["Bioyield point는 거대구조의 완전한 파열, Rupture point는 세포막 파괴를 의미","Bioyield point는 힘이 감소·정체돼도 변형이 늘어나는 지점, Rupture point는 시료가 급격히 붕괴·파열되는 지점","두 용어는 완전히 동일한 개념으로 혼용 가능","Bioyield point는 공학재료, Rupture point는 농산물에서만 쓰이는 용어"],"correct":1,"explain":"Bioyield point는 변형만 늘어나는 지점, Rupture point는 완전 붕괴 지점이에요.","wrongHint":"①은 두 정의를 서로 바꿔놓은 오답이에요."},{"type":"fill","q":"TPA는 1963년 Szczesniak 박사가 (　　)을 기계 수치와 연결하기 위한 객관적 분석법으로 최초 정립하였다.","accept":["관능작용","관능"],"display":"관능 작용","explain":"Szczesniak 박사는 사람이 음식을 씹는 관능 작용을 기계 수치와 연결해 TPA를 정립했어요."},{"type":"fill","q":"TPA에서 Cohesiveness(응집성)는 (　　) 압축 곡선 면적을 1차 압축 곡선 면적으로 나눈 값이다.","accept":["2차","second","secondbite","두번째"],"display":"2차 (Second Bite)","explain":"Cohesiveness = Area 2 ÷ Area 1 이에요."},{"type":"mc","q":"TPA Secondary Parameter 중 “Chewiness(씹힘성)”를 구하는 계산식으로 옳은 것은?","options":["Hardness × Cohesiveness","Hardness × Cohesiveness × Springiness","Cohesiveness × Springiness","Hardness × Springiness"],"correct":1,"explain":"Chewiness = Hardness × Cohesiveness × Springiness 예요.","wrongHint":"①은 Gumminess(뭉침성)의 계산식이에요."},{"type":"mc","q":"TPA 측정 시 주의사항으로 옳지 않은 것은?","options":["시료의 직경, 두께, 형상을 동일하게 규격화해야 한다","배치 간 시험 속도를 통일해야 한다","압축 시 샘플 직경보다 면적이 작은 프로브를 선택하는 것이 원칙이다","Two-Bite 사이의 간격 시간을 정확히 동기화해야 한다"],"correct":2,"explain":"프로브는 샘플보다 면적이 큰 것을 선택해야 해요. ③은 반대로 서술된 오답이에요.","wrongHint":"'작아야 정밀할 것'이라는 직관과 반대되는 정답이에요."},{"type":"mc","q":"Texture Analyzer 사용 시 가장 중요한 안전수칙은?","options":["시료의 온도를 항상 낮게 유지한다","작동 중 프로브 하강 구역에 손이나 이물질을 넣지 않는다","시료는 반드시 물에 적셔서 측정한다","측정은 반드시 2인 1조로만 진행한다"],"correct":1,"explain":"작동 중 손 삽입 금지가 가장 중요한 안전수칙이에요.","wrongHint":"④는 그럴듯하지만 강의자료에 명시된 내용은 아니에요."},{"type":"fill","q":"TPA 측정에서 변형율(deformation) 제어 시, 일반적으로 (　　)% 범위의 압축률을 최적으로 설정한다.","accept":["10~70","1070","10-70","10~70%"],"display":"10 ~ 70 (%)","explain":"파괴 한계를 고려해 10~70% 범위로 압축률을 설정해요."}];
+const POINTS_PER_Q = 20;
+
+let state = { questions: [], idx: 0, score: 0, answered: false, wrongList: [], isRetry: false };
+
+function startQuiz(questions, isRetry){
+  state.questions = questions; state.idx = 0; state.score = 0; state.wrongList = []; state.isRetry = !!isRetry;
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+  document.getElementById('quizTitle').textContent = (isRetry ? '틀린 문항 다시 풀기 · ' : '') + '2차시 · 고체 물성 측정의 이해';
+  buildProgressTrack(); updateScoreUI(false); renderQuestion();
+}
+
+function buildProgressTrack(){
+  const track = document.getElementById('progressTrack'); track.innerHTML = '';
+  state.questions.forEach(() => {
+    const seg = document.createElement('div'); seg.className = 'progress-seg';
+    seg.innerHTML = '<div class="fill"></div>'; track.appendChild(seg);
+  });
+}
+
+function updateProgressUI(){
+  const segs = document.querySelectorAll('#progressTrack .progress-seg .fill');
+  segs.forEach((f, i) => { f.style.width = i < state.idx ? '100%' : (i === state.idx ? '50%' : '0%'); });
+  document.getElementById('progressLabel').textContent = `문항 ${state.idx + 1} / ${state.questions.length}`;
+}
+
+function updateScoreUI(bump){
+  const max = state.questions.length * POINTS_PER_Q;
+  const pct = max ? state.score / max : 0;
+  const circumference = 97.4;
+  document.getElementById('gaugeRing').setAttribute('stroke-dashoffset', String(circumference * (1 - pct)));
+  const label = document.getElementById('ptsLabel');
+  label.textContent = state.score + '점';
+  if (bump){ label.classList.remove('bump'); void label.offsetWidth; label.classList.add('bump'); }
+}
+
+function renderQuestion(){
+  state.answered = false; updateProgressUI();
+  const item = state.questions[state.idx];
+  document.getElementById('qType').textContent = item.type === 'mc' ? '객관식' : '괄호넣기';
+  document.getElementById('qText').textContent = item.q;
+  const body = document.getElementById('qBody'); body.innerHTML = '';
+  const feedback = document.getElementById('feedback');
+  feedback.classList.remove('show', 'correct', 'wrong');
+  document.getElementById('nextBtn').classList.remove('show');
+
+  if (item.type === 'mc'){
+    const list = document.createElement('div'); list.className = 'opt-list';
+    const marks = ['①','②','③','④'];
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button'); btn.className = 'opt-btn';
+      btn.innerHTML = `<span class="opt-mark">${marks[i]}</span><span>${opt}</span>`;
+      btn.addEventListener('click', () => handleMcAnswer(i, btn, list));
+      list.appendChild(btn);
+    });
+    body.appendChild(list);
+  } else {
+    const row = document.createElement('div'); row.className = 'fill-row';
+    const input = document.createElement('input'); input.className = 'fill-input'; input.type = 'text';
+    input.placeholder = '정답을 입력하세요';
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitBtn.click(); });
+    const submitBtn = document.createElement('button'); submitBtn.className = 'submit-btn'; submitBtn.textContent = '제출';
+    submitBtn.addEventListener('click', () => handleFillAnswer(input, submitBtn));
+    row.appendChild(input); row.appendChild(submitBtn); body.appendChild(row);
+    setTimeout(() => input.focus(), 50);
+  }
+}
+
+function normalize(str){ return String(str).toLowerCase().replace(/[\s()·.,\-]/g, ''); }
+
+function handleMcAnswer(i, btn, list){
+  if (state.answered) return; state.answered = true;
+  const item = state.questions[state.idx]; const isCorrect = i === item.correct;
+  [...list.children].forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === item.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  applyFeedback(isCorrect, item, isCorrect ? null : item.options[i]);
+}
+
+function handleFillAnswer(input, submitBtn){
+  if (state.answered) return;
+  const val = input.value.trim(); if (!val) { input.focus(); return; }
+  state.answered = true;
+  const item = state.questions[state.idx]; const norm = normalize(val);
+  const isCorrect = item.accept.some(a => norm.includes(normalize(a)) || normalize(a).includes(norm));
+  input.disabled = true; submitBtn.disabled = true; input.classList.add(isCorrect ? 'correct' : 'wrong');
+  applyFeedback(isCorrect, item, isCorrect ? null : val, item.display);
+}
+
+function applyFeedback(isCorrect, item, userWrongText, correctDisplay){
+  if (isCorrect){ state.score += POINTS_PER_Q; } else { state.wrongList.push({ item, userAnswer: userWrongText }); }
+  updateScoreUI(isCorrect);
+  const fb = document.getElementById('feedback');
+  const fbTitle = document.getElementById('fbTitle'); const fbBody = document.getElementById('fbBody');
+  fb.classList.remove('correct', 'wrong'); fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  fbTitle.textContent = isCorrect ? '✅ 정답입니다!' : '❌ 오답입니다';
+  let html = '';
+  if (!isCorrect && correctDisplay){ html += `<div class="fb-answer">정답: ${correctDisplay}</div>`; }
+  html += `<div>${item.explain}</div>`;
+  if (!isCorrect && item.wrongHint){ html += `<div style="margin-top:4px;">${item.wrongHint}</div>`; }
+  fbBody.innerHTML = html;
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  state.idx += 1;
+  if (state.idx >= state.questions.length){ showResult(); } else { renderQuestion(); }
+});
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'block';
+});
+
+function showResult(){
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+  const total = state.questions.length; const correctCount = total - state.wrongList.length;
+  const max = total * POINTS_PER_Q; const pct = max ? state.score / max : 0;
+  const circumference = 377;
+  document.getElementById('resultRing').setAttribute('stroke-dashoffset', String(circumference * (1 - pct)));
+  document.getElementById('resultBig').textContent = state.score;
+  document.getElementById('resultCount').textContent = `${correctCount} / ${total} 정답`;
+  let msg = '';
+  if (correctCount === total) msg = '완벽해요! 모든 문항을 맞혔어요 🎉';
+  else if (correctCount >= total * 0.6) msg = '잘했어요! 조금만 더 다듬어봐요 💪';
+  else msg = '다시 한 번 개념을 확인해봐요 📘';
+  document.getElementById('resultMsg').textContent = msg;
+
+  const list = document.getElementById('resultList'); list.innerHTML = '';
+  state.questions.forEach((item, i) => {
+    const wasWrong = state.wrongList.some(w => w.item === item);
+    const row = document.createElement('div'); row.className = 'result-row ' + (wasWrong ? 'no' : 'ok');
+    row.innerHTML = `<span class="icon">${wasWrong ? '✕' : '✓'}</span><span>Q${i+1}. ${item.q.length > 40 ? item.q.slice(0,40)+'…' : item.q}</span>`;
+    list.appendChild(row);
+  });
+
+  const actions = document.getElementById('resultActions'); actions.innerHTML = '';
+  if (state.wrongList.length > 0){
+    const retryBtn = document.createElement('button'); retryBtn.className = 'btn-primary';
+    retryBtn.textContent = `틀린 문항만 다시 풀기 (${state.wrongList.length}문항)`;
+    retryBtn.addEventListener('click', () => { const wrongQuestions = state.wrongList.map(w => w.item); startQuiz(wrongQuestions, true); });
+    actions.appendChild(retryBtn);
+  }
+  const homeBtn = document.createElement('button'); homeBtn.className = 'btn-secondary'; homeBtn.textContent = '처음부터 다시 풀기';
+  homeBtn.addEventListener('click', () => { startQuiz(QUESTIONS, false); });
+  actions.appendChild(homeBtn);
+}
+
+document.getElementById('startBtn').addEventListener('click', () => startQuiz(QUESTIONS, false));
+</script>
+</body>
+</html>
